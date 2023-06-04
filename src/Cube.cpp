@@ -120,9 +120,9 @@ byte	GetAxisLine(byte Axis, byte a, byte b) {
 	}
 //-----------------------------------------------------------------------------
 // Set all LED's in an Axis plane at a selected level on that axis
-// Axis = X, a=Y
-// Axis = Y, a=X
-// Axis = Z, a=X
+// Axis = ZX, a=Y
+// Axis = ZY, a=X
+// Axis = XY, a=Z
 void	SetPlane(byte Plane, byte a, bool Level) {
 	int 	i;
 
@@ -152,7 +152,7 @@ void	SetAllLEDS(bool Level) {
 			CubeArray[i][j] = (Level)?0xFF:0x00;
 	}
 //-----------------------------------------------------------------------------
-void	SetAllLEDSOff() {
+void	SetAllPixelsOff() {
 	SetAllLEDS(OFF);
 	}
 //-----------------------------------------------------------------------------
@@ -233,4 +233,25 @@ void	GetCharPattern(char Ch, byte rtnCh[5]) {
 		}
 	}
 //-----------------------------------------------------------------------------
+void	AddTextToCubeLayer(byte plane, char Ch) {
+	byte ChData[5] = {0};
+	int i;
+
+	GetCharPattern(Ch, ChData);
+	for(i = 0; i<5; i++) {
+		switch(plane) {
+			case Plane_ZX:
+				SetAxisLine(Axis_Z, i+1, 0, ChData[i]);
+				break;
+			case Plane_ZY:
+				SetAxisLine(Axis_Z, 0, i+1, ChData[i]);
+				break;
+			case Plane_XY:
+				SetAxisLine(Axis_Y, i+1, 0, ChData[i]);
+				break;
+			}
+		}
+	}
+//-----------------------------------------------------------------------------
+
 //-----------------------------------------------------------------------------

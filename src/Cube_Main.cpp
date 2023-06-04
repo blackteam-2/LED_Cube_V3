@@ -17,16 +17,20 @@ void	SetData(byte data);
 void	SetLayer(byte layer, bool level);
 void	SetMuxAddy(byte addy);
 
-#define	UPDATE_16HZ	977
-#define	UPDATE_20HZ	781
-#define	UPDATE_40HZ	40
+#define UPDATE_0_25Hz	62500
+#define UPDATE_1Hz		15625
+#define UPDATE_4Hz		3906
+#define UPDATE_8Hz		1953
+#define	UPDATE_16HZ		977
+#define	UPDATE_20HZ		781
+#define	UPDATE_40HZ		40
 
 // Data Array to hold the text info for itterating around the path
 volatile byte textPath[TEXTPATHLEN] = {0};
 
 // Holds the current layer that is active
 volatile byte curLayer = 1;
-volatile int prevLayer = 0;
+volatile byte prevLayer = 0;
 
 
 //-----------------------------------------------------------------------------
@@ -34,7 +38,7 @@ void	InitCube(void) {
 	int i;
 
 	// Set the cube data to all off
-	SetAllLEDSOff();
+	SetAllPixelsOff();
 
 	// Setup the IO
 	SetupCubeIO();
@@ -44,10 +48,10 @@ void	InitCube(void) {
 		LatchLayer(i, false);
 
 	// Start the cube update by enabling the timer and ISR
-	//Setup_Timer1(UPDATE_20HZ);
+	Setup_Timer1(UPDATE_20HZ);
 
 	// Enable Global Interupts
-	//sei();
+	sei();
 	}
 //-----------------------------------------------------------------------------
 void	SetupCubeIO(void) {
@@ -75,16 +79,17 @@ void	Setup_Timer1(uint16_t reloadVal){
 	
 	if (reloadVal == 0) { return; }
 	
-	//
+	Serial.println("Start");
+	// CRC Mode, OVF_Int, Clk/64
 	TCCR1B |= (1 << WGM12);
 	OCR1A = reloadVal;
-	TIMSK1 |= (1 << TOIE1);
+	TIMSK1 |= (1 << OCIE1A);
 	TCCR1B |= (1 << CS12) | (CS10);
 	}
 //-----------------------------------------------------------------------------
 // Cube Update ISR
 // This controls the persistence of vision 
-ISR(TIMER1_OVF_vect) {
+ISR(TIMER1_COMPA_vect) {
 	byte 	temp;
 	int 	a;
 
@@ -101,6 +106,9 @@ ISR(TIMER1_OVF_vect) {
 		}
 	//turn current layer on
 	LatchLayer(curLayer, false);
+
+	if(Debounce[0]>0) Debounce[0]--;
+	if(Debounce[1]>0) Debounce[1]--;
 	}
 //-----------------------------------------------------------------------------
 void	LatchData(byte multiplex, byte data) {

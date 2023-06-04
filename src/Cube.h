@@ -45,8 +45,9 @@ bool	GetPixel(byte X, byte Y, byte Z);
 void	SetAxisLine(byte Axis, byte a, byte b, byte data);
 byte	GetAxisLine(byte Axis, byte a, byte b);
 void	SetPlane(byte Plane, byte a, bool Level);
-void	SetAllLEDSOff();
+void	SetAllPixelsOff();
 void	SetAllLEDSOn();
 void	ShiftPlane(byte Plane, byte NoPos, bool Dir, bool ClrLay);
+void	AddTextToCubeLayer(byte plane, char Ch);
 
 #endif //__CUBE__

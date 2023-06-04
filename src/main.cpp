@@ -1,14 +1,54 @@
 #include	<Arduino.h>
 #include	"Cube_Main.h"
+#include	"Cube_IO.h"
 
-int port, data;
+char	*VerString = "0.00.01";
 
-void setup() {
-	InitCube();
-	Serial.begin(57600);
+int 	port, data;
+
+volatile	byte	Debounce[2];
+volatile 	bool 	BtnFlag[2] = {false, false};
+
+volatile	byte	PinCTemp;
+volatile	bool	TestPinPlag;
+//-----------------------------------------------------------------------------
+ISR(PCINT1_vect){
+	// SW401
+	if (((PINC&0x04)==0)&&(Debounce[0]==0)) {
+		BtnFlag[0] = true;
+		Debounce[0] = 20;
+		}
+	// SW402
+	if (((PINC&0x08)==0)&&(Debounce[1]==0)) {
+		BtnFlag[1] = true;
+		Debounce[1] = 20;
+		}
+}
+//-----------------------------------------------------------------------------
+void	SetupButtons(void) {
+	pinMode(PIN_BUTT_LEFT, INPUT_PULLUP);
+	pinMode(PIN_BUTT_RIGHT, INPUT_PULLUP);
+
+	// Set the mask for the PCINT pins (PCINT10 + PCINT11)
+	PCMSK1 = 0x0C;
+	// Set The Pin Change int bank (PCINT1)
+	PCICR = 0x02;
 	}
+//-----------------------------------------------------------------------------
+void setup() {
+	Serial.begin(57600);
+	while (!Serial);
 
+	SetupButtons();
+	InitCube();
+
+	Serial.print("\r\nLED Cube V2 (");
+	Serial.print(VerString);
+	Serial.print(")\r\n");
+	}
+//-----------------------------------------------------------------------------
 void loop() {
+	// Check the serial port
 	if(Serial.available()>0) {
 		switch (Serial.read()){
 			case 'A':
@@ -22,6 +62,9 @@ void loop() {
 			case 'C':
 				SetData(0xAA);
 				Serial.println("SetData(0xAA)");
+				break;
+			case 'D':
+				digitalWrite(13, !digitalRead(13));
 				break;
 			case 'P':
 				delay(2);
@@ -52,5 +95,22 @@ void loop() {
 				break;
 			}
 		}
-	}
-
+	// Check the xxx Btn
+	if(BtnFlag[0]) {
+		Serial.println("SW401");
+		BtnFlag[0] = false;
+		}
+	// Check the xxx Btn
+	if(BtnFlag[1]) {
+		Serial.println("SW402");
+		BtnFlag[1] = false;
+		}
+	// 
+	if(TestPinPlag) {
+		Serial.print("Debounce: ");
+		Serial.write(PinCTemp);
+		Serial.write("\r\n");
+		TestPinPlag = false;
+		}
+	}// Loop()
+//-----------------------------------------------------------------------------

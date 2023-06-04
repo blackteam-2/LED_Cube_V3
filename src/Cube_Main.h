@@ -3,6 +3,10 @@
 
 #include	<Arduino.h>
 
+extern	volatile	byte	Debounce[2];
+extern	volatile	byte	PinCTemp;
+extern	volatile	bool	TestPinPlag;
+
 void	InitCube(void);
 void	SetupCubeIO(void);
 void	Setup_Timer1(uint16_t reloadVal);
