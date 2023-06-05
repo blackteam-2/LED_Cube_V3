@@ -48,6 +48,11 @@ void	SetPlane(byte Plane, byte a, bool Level);
 void	SetAllPixelsOff();
 void	SetAllLEDSOn();
 void	ShiftPlane(byte Plane, byte NoPos, bool Dir, bool ClrLay);
+void	GetCharPattern(char Ch, byte rtnCh[5]);
 void	AddTextToCubeLayer(byte plane, char Ch);
+void	ResetTextPath(void);
+void	AddChToPath(byte inputChr, int pos);
+void	IncrementPath(void);
+void	AddPathToCube(void);
 
 #endif //__CUBE__

@@ -23,7 +23,7 @@ ISR(PCINT1_vect){
 		BtnFlag[1] = true;
 		Debounce[1] = 20;
 		}
-}
+	}
 //-----------------------------------------------------------------------------
 void	SetupButtons(void) {
 	pinMode(PIN_BUTT_LEFT, INPUT_PULLUP);

@@ -25,9 +25,6 @@ void	SetMuxAddy(byte addy);
 #define	UPDATE_20HZ		781
 #define	UPDATE_40HZ		40
 
-// Data Array to hold the text info for itterating around the path
-volatile byte textPath[TEXTPATHLEN] = {0};
-
 // Holds the current layer that is active
 volatile byte curLayer = 1;
 volatile byte prevLayer = 0;

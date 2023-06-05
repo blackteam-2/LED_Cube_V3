@@ -3,6 +3,8 @@
 
 #include	<Arduino.h>
 
+typedef unsigned long dword;
+
 extern	volatile	byte	Debounce[2];
 extern	volatile	byte	PinCTemp;
 extern	volatile	bool	TestPinPlag;

@@ -5,6 +5,12 @@ word	const	wBit[0x10] = {
 	BIT0, BIT1, BIT2, BIT3, BIT4, BIT5, BIT6, BIT7,
 	BIT8, BIT9, BITA, BITB, BITC, BITD, BITE, BITF};
 
+/*
+This is the main cube data, as wel as the basic functions to interact
+with the array and set, clear, and read data. This also contains the
+data/functions for handling text as well as the scrollint text
+*/
+
 // ====== Main Cube Data Array ======
 // 8 bits in byte is Y, [X][Z]
 // X - Right	->	Left
@@ -41,6 +47,8 @@ ________________________________________________________________________________
 */
 byte	CubeArray[8][8];
 int		CurrentLayer = 0;
+// Data Array to hold the text info for itterating around the path
+volatile unsigned char textPath[TEXTPATHLEN] = {0};
 
 //-----------------------------------------------------------------------------
 // Set the value of a LED at the specefied position in the array
@@ -253,5 +261,62 @@ void	AddTextToCubeLayer(byte plane, char Ch) {
 		}
 	}
 //-----------------------------------------------------------------------------
+void	ResetTextPath(void) {
+	int i; 
 
+	for(i=0; i<TEXTPATHLEN; i++) {
+		textPath[i] = 0;
+		}
+	}
+//-----------------------------------------------------------------------------
+void	AddChToPath(byte inputChr, int pos) {
+	textPath[pos] = inputChr;
+	}
+//-----------------------------------------------------------------------------
+void	IncrementPath(void) {
+	int i;
+
+	for(i=TEXTPATHLEN; i>=0; i--) {
+		textPath[i+1] = textPath[i];
+		}
+	textPath[0] = 0;
+	}
+//-----------------------------------------------------------------------------
+// Start Path in back right corner, scrol in clockwise looking top down
+void	AddPathToCube(void) {
+	//			Axis  , X, Y, Data
+	// Y axis, back to front
+	SetAxisLine(Axis_Z, 0, 7, textPath[0]);
+	SetAxisLine(Axis_Z, 0, 6, textPath[1]);
+	SetAxisLine(Axis_Z, 0, 5, textPath[2]);
+	SetAxisLine(Axis_Z, 0, 4, textPath[3]);
+	SetAxisLine(Axis_Z, 0, 3, textPath[4]);
+	SetAxisLine(Axis_Z, 0, 2, textPath[5]);
+	SetAxisLine(Axis_Z, 0, 1, textPath[6]);
+	SetAxisLine(Axis_Z, 0, 0, textPath[7]);
+	// X axis, front cube, right to left
+	SetAxisLine(Axis_Z, 1, 0, textPath[8]);
+	SetAxisLine(Axis_Z, 2, 0, textPath[9]);
+	SetAxisLine(Axis_Z, 3, 0, textPath[10]);
+	SetAxisLine(Axis_Z, 4, 0, textPath[11]);
+	SetAxisLine(Axis_Z, 5, 0, textPath[12]);
+	SetAxisLine(Axis_Z, 6, 0, textPath[13]);
+	SetAxisLine(Axis_Z, 7, 0, textPath[14]);
+	// Y axis, front to back
+	SetAxisLine(Axis_Z, 7, 1, textPath[15]);
+	SetAxisLine(Axis_Z, 7, 2, textPath[16]);
+	SetAxisLine(Axis_Z, 7, 3, textPath[17]);
+	SetAxisLine(Axis_Z, 7, 4, textPath[18]);
+	SetAxisLine(Axis_Z, 7, 5, textPath[19]);
+	SetAxisLine(Axis_Z, 7, 6, textPath[20]);
+	SetAxisLine(Axis_Z, 7, 7, textPath[21]);
+	// x axis, cube back, left to right
+	SetAxisLine(Axis_Z, 6, 7, textPath[22]);
+	SetAxisLine(Axis_Z, 6, 6, textPath[23]);
+	SetAxisLine(Axis_Z, 6, 5, textPath[24]);
+	SetAxisLine(Axis_Z, 6, 4, textPath[25]);
+	SetAxisLine(Axis_Z, 6, 3, textPath[26]);
+	SetAxisLine(Axis_Z, 6, 2, textPath[27]);
+	SetAxisLine(Axis_Z, 6, 1, textPath[28]);
+	}
 //-----------------------------------------------------------------------------
