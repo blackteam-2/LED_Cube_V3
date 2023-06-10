@@ -320,3 +320,14 @@ void	AddPathToCube(void) {
 	SetAxisLine(Axis_Z, 6, 1, textPath[28]);
 	}
 //-----------------------------------------------------------------------------
+void	CheckArgOrder(int in1, int in2, int *out1, int *out2){
+	if (in1 > in2){
+		int tempVal = in1;
+		in1 = in2;
+		in2 = tempVal;
+		}
+	
+	*out1 = in1;
+	*out2 = in2;
+	}
+//-----------------------------------------------------------------------------

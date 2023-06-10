@@ -18,10 +18,10 @@ void	EffectLoop(int Effect) {
 			Effect_Rain(120, 100);
 			break;
 		case EFF_TopDown:
-			Effect_TopDown(Axis_Z, 3, true, 5, 500);
+			//Effect_TopDown(Axis_Z, 3, true, 5, 500);
 			break;
 		case EFF_ShootText:
-			EffectShootText(Plane_XY, "9876543210", 1, 600, 50);
+			//EffectShootText(Plane_XY, "9876543210", 1, 600, 50);
 			break;
 		case EFF_Firework:
 			break;
@@ -120,7 +120,8 @@ void	Effect_TopDown(byte axis, int seperation, bool direction, int iterations, i
 	}
 //-----------------------------------------------------------------------------
 void	EffectShootText(byte plane, String inputStr, int iterations, int delayTime, int shiftDelayTime) {
-	unsigned int	i, j, k, len;
+	int				i, j, len;
+	byte			k;
 	String			Str = inputStr;
 	char			Ch;
 
@@ -143,7 +144,7 @@ void	EffectShootText(byte plane, String inputStr, int iterations, int delayTime,
 	}
 //-----------------------------------------------------------------------------
 void	EffectFireworks(int iterations, int n, int delayTime) {
-	int ilk, f, e;
+	int i, j, k;
 	float origin_x = 3;
 	float origin_y = 3;
 	float origin_z = 3;
@@ -153,7 +154,7 @@ void	EffectFireworks(int iterations, int n, int delayTime) {
 	SetAllPixelsOff();
 	// Particles and their position, x,y,z and their movement, dx, dy, dz
 	float particles[n][6];
-	for (ilk = 0; ilk < iterations; ilk++) {
+	for (i=0; i<iterations; i++) {
 		origin_x = rand() % 4;
 		origin_y = rand() % 4;
 		origin_z = rand() % 2;
@@ -161,35 +162,35 @@ void	EffectFireworks(int iterations, int n, int delayTime) {
 		origin_x += 2;
 		origin_y += 2;
 		// shoot a particle up in the air
-		for (e = 0; e < origin_z; e++) {
-			SetPixel(e, origin_x, origin_y, true);
-			delay(160 * e);
+		for (k=0; k<origin_z; k++) {
+			SetPixel(k, origin_x, origin_y, true);
+			delay(160 * k);
 			SetAllPixelsOff();
 			}
 		// Fill particle array
-		for (f = 0; f < n; f++) {
+		for (j=0; j<n; j++) {
 			// Position
-			particles[f][0] = origin_x;
-			particles[f][1] = origin_y;
-			particles[f][2] = origin_z;
+			particles[j][0] = origin_x;
+			particles[j][1] = origin_y;
+			particles[j][2] = origin_z;
 			rand_x = rand()%200;
 			rand_y = rand()%200;
 			rand_z = rand()%200;
 			// Movement
-			particles[f][3] = 1 - (float)rand_x / 100; // dx
-			particles[f][4] = 1 - (float)rand_y / 100; // dy
-			particles[f][5] = 1 - (float)rand_z / 100; // dz
+			particles[j][3] = 1 - (float)rand_x / 100; // dx
+			particles[j][4] = 1 - (float)rand_y / 100; // dy
+			particles[j][5] = 1 - (float)rand_z / 100; // dz
 			}
 		// explode
-		for (e = 0; e < 25; e++) {
-			slowrate = 1 + tan((e + 0.1) / 20) * 10;
-			gravity = tan((e + 0.1) / 20) / 2;
-			for (f = 0; f < n; f++) {
-				particles[f][0] += particles[f][3] / slowrate;
-				particles[f][1] += particles[f][4] / slowrate;
-				particles[f][2] += particles[f][5] / slowrate;
-				particles[f][2] -= gravity;
-				SetPixel(particles[f][2],particles[f][0],particles[f][1],true);
+		for (k=0; k<25; k++) {
+			slowrate = 1 + tan((k + 0.1) / 20) * 10;
+			gravity = tan((k + 0.1) / 20) / 2;
+			for (j=0; j<n; j++) {
+				particles[j][0] += particles[j][3] / slowrate;
+				particles[j][1] += particles[j][4] / slowrate;
+				particles[j][2] += particles[j][5] / slowrate;
+				particles[j][2] -= gravity;
+				SetPixel(particles[j][2],particles[j][0],particles[j][1],true);
 				}
 			delay(delayTime);
 			SetAllPixelsOff();
@@ -199,23 +200,22 @@ void	EffectFireworks(int iterations, int n, int delayTime) {
 //-----------------------------------------------------------------------------
 void	EffectScrollText(int iterations, String inputstr, int delayTime) {
 	int i, j, k;
-	String inputString = inputstr;
-	int stringLength = inputstr.length();
+	String inpStr = inputstr;
+	int len = inputstr.length();
 
 	SetAllPixelsOff();
 	ResetTextPath();
-	for (i = 0; i < iterations ; i++) {
-		//
-		for (j = 0 ; j < stringLength ; j++) {
+	for (i=0; i<iterations ; i++) {
+		for (j=0 ; j<len ; j++) {
 			//
-			char currentChr = inputString[j];
-			unsigned char chrPattern[5] = {0};
-			GetCharPattern(currentChr, chrPattern);
+			char Ch = inpStr[j];
+			unsigned char ChArr[5] = {0};
+			GetCharPattern(Ch, ChArr);
 			
-			//
-			for (k = 0 ; k < 5 ; k++) {
+			// Add the new chrachter 
+			for (k=0 ; k<5 ; k++) {
 				//
-				AddChToPath(chrPattern[k], 0);
+				AddChToPath(ChArr[k], 0);
 				AddPathToCube();
 				delay(delayTime);
 				IncrementPath();
@@ -226,7 +226,7 @@ void	EffectScrollText(int iterations, String inputstr, int delayTime) {
 			IncrementPath();
 			AddPathToCube();
 			}
-		for (int k = 0 ; k < TEXTPATHLEN - 4 ; k++) {
+		for (k=0 ; k<TEXTPATHLEN-4 ; k++) {
 			delay(delayTime);
 			IncrementPath();
 			AddPathToCube();
@@ -234,7 +234,57 @@ void	EffectScrollText(int iterations, String inputstr, int delayTime) {
 		}
 	}
 //-----------------------------------------------------------------------------
+void Effect_ShootRandPixel(byte plane, int iterations, int delayTimeSmall, int delayTimeLarge) {
+	int 	i, j;
+	byte 	x, y, dir;
 
+	for(i=0; i<iterations; i++) {
+		dir = random(0,2);
+		x = random(0,8);
+		y = random(0,8);
+		if(dir)
+			for(j=1; j<CUBESIZE; j++) {
+				switch(plane) {
+					case Plane_ZX:
+						SetPixel(x, i, y, true);
+						SetPixel(x, i-1, y, false);
+						delay(delayTimeSmall);
+						break;
+					case Plane_ZY:
+						SetPixel(i, y, x, true);
+						SetPixel(i-1, y, x, false);
+						delay(delayTimeSmall);
+						break;
+					case Plane_XY:
+						SetPixel(x, y, i, true);
+						SetPixel(x, y, i-1, false);
+						delay(delayTimeSmall);
+						break;
+					}
+				}
+		else
+			for(j=6; j>=0; j--) {
+				switch(plane) {
+					case Plane_ZX:
+						SetPixel(x, i, y, true);
+						SetPixel(x, i+1, y, false);
+						delay(delayTimeSmall);
+						break;
+					case Plane_ZY:
+						SetPixel(i, y, x, true);
+						SetPixel(i+1, y, x, false);
+						delay(delayTimeSmall);
+						break;
+					case Plane_XY:
+						SetPixel(x, y, i, true);
+						SetPixel(x, y, i+1, false);
+						delay(delayTimeSmall);
+						break;
+					}
+				}
+		delay(delayTimeLarge);
+		}
+	}
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------

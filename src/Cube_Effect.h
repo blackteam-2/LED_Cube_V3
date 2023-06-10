@@ -1,6 +1,8 @@
 #ifndef	__CUBE_EFFECT__
 #define	__CUBE_EFFECT__
 
+#include	<Arduino.h>
+
 typedef enum {
 	EFF_ALL = 0, 		EFF_Rain = 1, 		EFF_TopDown = 2, 
 	EFF_ShootText = 3,	EFF_Firework = 4,	EFF_ScrolText = 5,

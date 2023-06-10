@@ -54,5 +54,6 @@ void	ResetTextPath(void);
 void	AddChToPath(byte inputChr, int pos);
 void	IncrementPath(void);
 void	AddPathToCube(void);
+void 	CheckArgOrder(int in1, int in2, int *out1, int *out2);
 
 #endif //__CUBE__
