@@ -23,6 +23,8 @@ void	SetMuxAddy(byte addy);
 #define UPDATE_8Hz		1953
 #define	UPDATE_16HZ		977
 #define	UPDATE_20HZ		781
+#define	UPDATE_30HZ		521
+#define	UPDATE_40HZ1	390
 #define	UPDATE_40HZ		40
 
 // Holds the current layer that is active
@@ -45,7 +47,7 @@ void	InitCube(void) {
 		LatchLayer(i, false);
 
 	// Start the cube update by enabling the timer and ISR
-	Setup_Timer1(UPDATE_20HZ);
+	Setup_Timer1(UPDATE_40HZ1);
 
 	// Enable Global Interupts
 	sei();
@@ -77,7 +79,7 @@ void	Setup_Timer1(uint16_t reloadVal){
 	if (reloadVal == 0) { return; }
 	
 	Serial.println("Start");
-	// CRC Mode, OVF_Int, Clk/64
+	// CRC Mode, OVF_Int, Clk/1024
 	TCCR1B |= (1 << WGM12);
 	OCR1A = reloadVal;
 	TIMSK1 |= (1 << OCIE1A);
@@ -92,17 +94,17 @@ ISR(TIMER1_COMPA_vect) {
 
 	//turn previous layer off
 	prevLayer = curLayer;
-	LatchLayer(prevLayer, true);
+	LatchLayer(prevLayer, false);
 	
-	if (++curLayer == 7) curLayer = 0;
+	if (++curLayer == CUBESIZE) curLayer = 0;
 
 	//set data latches 
-	for (a=0; a<CUBESIZE-1; a++) {
+	for (a=0; a<CUBESIZE; a++) {
 		temp = GetAxisLine(Axis_Y, a, curLayer);
 		LatchData(a, temp);
 		}
 	//turn current layer on
-	LatchLayer(curLayer, false);
+	LatchLayer(curLayer, true);
 
 	if(Debounce[0]>0) Debounce[0]--;
 	if(Debounce[1]>0) Debounce[1]--;
@@ -113,6 +115,7 @@ void	LatchData(byte multiplex, byte data) {
 	digitalWrite(PIN_CS, HIGH);
 	SetData(data);
 	digitalWrite(PIN_CS, LOW);
+	delayMicroseconds(2);
 	}
 //-----------------------------------------------------------------------------
 volatile	void	LatchLayer(byte layer, bool level) {
@@ -134,6 +137,16 @@ void	SetData(byte data) {
 	}
 //-----------------------------------------------------------------------------
 void	SetLayer(byte layer, bool level) {
+	//Se the bus to a known state, ALL OFF
+	digitalWrite(PIN_DATA0, HIGH);
+	digitalWrite(PIN_DATA1, HIGH);
+	digitalWrite(PIN_DATA2, HIGH);
+	digitalWrite(PIN_DATA3, HIGH);
+	digitalWrite(PIN_DATA4, HIGH);
+	digitalWrite(PIN_DATA5, HIGH);
+	digitalWrite(PIN_DATA6, HIGH);
+	digitalWrite(PIN_DATA7, HIGH);
+	// Set the Specific layer control pin
 	switch(layer) {
 		case 0:
 			digitalWrite(PIN_DATA0, level?LOW:HIGH);
@@ -160,14 +173,28 @@ void	SetLayer(byte layer, bool level) {
 			digitalWrite(PIN_DATA7, level?LOW:HIGH);
 			break;
 		case 8:
-			digitalWrite(PIN_DATA0, LOW);
-			digitalWrite(PIN_DATA1, LOW);
-			digitalWrite(PIN_DATA2, LOW);
-			digitalWrite(PIN_DATA3, LOW);
-			digitalWrite(PIN_DATA4, LOW);
-			digitalWrite(PIN_DATA5, LOW);
-			digitalWrite(PIN_DATA6, LOW);
-			digitalWrite(PIN_DATA7, LOW);
+			if(level){
+				digitalWrite(PIN_DATA0, HIGH);
+				digitalWrite(PIN_DATA1, HIGH);
+				digitalWrite(PIN_DATA2, HIGH);
+				digitalWrite(PIN_DATA3, HIGH);
+				digitalWrite(PIN_DATA4, HIGH);
+				digitalWrite(PIN_DATA5, HIGH);
+				digitalWrite(PIN_DATA6, HIGH);
+				digitalWrite(PIN_DATA7, HIGH);
+				}
+			/* We should never turn all the layers on at once
+			else{
+				digitalWrite(PIN_DATA0, LOW);
+				digitalWrite(PIN_DATA1, LOW);
+				digitalWrite(PIN_DATA2, LOW);
+				digitalWrite(PIN_DATA3, LOW);
+				digitalWrite(PIN_DATA4, LOW);
+				digitalWrite(PIN_DATA5, LOW);
+				digitalWrite(PIN_DATA6, LOW);
+				digitalWrite(PIN_DATA7, LOW);
+				}
+				*/
 			break;
 		}
 	}

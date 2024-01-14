@@ -9,8 +9,8 @@ typedef enum {
 	}EffectEnum;
 
 void	EffectLoop(int Effect);
-void	Effect_Rain(int iterations, int itterationDelay);
-void	Effect_TopDown(byte axis, int seperation, bool direction, int iterations, int itterationDelay);
+void	Effect_Rain(int iterations, unsigned long itterationDelay);
+void	Effect_TopDown(byte axis, int seperation, bool direction, int iterations, unsigned long itterationDelay);
 void	EffectShootText(byte plane, String inputStr, int iterations, int delayTime, int shiftDelayTime);
 void	EffectFireworks(int iterations, int n, int delayTime);
 void	EffectScrollText(int iterations, String inputstr, int delayTime);

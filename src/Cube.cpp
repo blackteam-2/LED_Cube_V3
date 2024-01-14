@@ -208,12 +208,12 @@ void	ShiftPlane(byte Plane, byte NoPos, bool Dir, bool ClrLay) {
 			if(Dir) {
 				for(i=(CUBESIZE-1); i>=NoPos; i--)
 					for(j=0; j<CUBESIZE; j++)
-						SetAxisLine(Axis_Y, j, i, GetAxisLine(Axis_Z, j, i-NoPos));
+						SetAxisLine(Axis_Y, j, i, GetAxisLine(Axis_Y, j, i-NoPos));
 				}
 			else {
 				for(i=0; i<=CUBESIZE-NoPos; i++)
 					for(j=0; j<CUBESIZE; j++)
-						SetAxisLine(Axis_Y, j, i, GetAxisLine(Axis_Z, j, i+NoPos));
+						SetAxisLine(Axis_Y, j, i, GetAxisLine(Axis_Y, j, i+NoPos));
 				}
 			break;
 		}

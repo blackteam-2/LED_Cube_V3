@@ -30,13 +30,14 @@ void	EffectLoop(int Effect) {
 		}
 	}
 //-----------------------------------------------------------------------------
-void	Effect_Rain(int iterations, int itterationDelay) {
+void	Effect_Rain(int iterations, unsigned long itterationDelay) {
 	int iterCnt, i, j;
 	byte xx, yy;
 
 	SetAllPixelsOff();
 	for(iterCnt=0; iterCnt<iterations; iterCnt++) {
-		ShiftPlane(Plane_XY, 1, false, true);
+		ShiftPlane(Plane_XY, 1, false, false);
+		SetPlane(Plane_XY, 7, false);
 		j = random(10, 20);
 		for(i=0; i<j; i++) {
 			xx = random(0, 8);
@@ -47,7 +48,7 @@ void	Effect_Rain(int iterations, int itterationDelay) {
 		}
 	}
 //-----------------------------------------------------------------------------
-void	Effect_TopDown(byte axis, int seperation, bool direction, int iterations, int itterationDelay) {
+void	Effect_TopDown(byte axis, int seperation, bool direction, int iterations, unsigned long itterationDelay) {
 	int i, j;
 
 	SetAllPixelsOff();
@@ -71,13 +72,15 @@ void	Effect_TopDown(byte axis, int seperation, bool direction, int iterations, i
 					SetPlane(Plane_ZY, 7, false);
 					break;
 				case Axis_Y:
+					ShiftPlane(Plane_ZX, 1, direction, false);
 					SetPlane(Plane_ZX, 7, false);
 					break;
 				case Axis_Z:
+					ShiftPlane(Plane_XY, 1, !direction, false);
 					SetPlane(Plane_XY, 7, false);
 					break;
 				}
-			if(i == (seperation - 1)) {
+			if(j == (seperation - 1)) {
 				switch(axis) {
 					case Axis_X:
 						SetPlane(Plane_ZY, 7, true);
@@ -90,6 +93,7 @@ void	Effect_TopDown(byte axis, int seperation, bool direction, int iterations, i
 						break;
 					}
 				}
+			delay(itterationDelay);
 			}
 		}
 	/*
@@ -286,7 +290,22 @@ void Effect_ShootRandPixel(byte plane, int iterations, int delayTimeSmall, int d
 		}
 	}
 //-----------------------------------------------------------------------------
+void	Effect_UpDown_Suspend(int iterations, int SmallDelayTime, int LongDelayTime) {
+	/*int itt, i, j, k;
 
+
+	SetAllPixelsOff();
+	for(itt=0; itt<iterations; itt++) {
+		// move plane up
+
+		// move plane bottom up
+
+		// move plane down
+
+		//move plain top down
+
+		}*/
+	}
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------

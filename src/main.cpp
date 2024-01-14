@@ -1,10 +1,12 @@
 #include	<Arduino.h>
 #include	"Cube_Main.h"
 #include	"Cube_IO.h"
+#include	"Cube_Effect.h"
+#include	"Cube.h"
 
 char	*VerString = "0.00.01";
 
-int 	port, data;
+int 	i, port, data;
 
 volatile	byte	Debounce[2];
 volatile 	bool 	BtnFlag[2] = {false, false};
@@ -35,6 +37,10 @@ void	SetupButtons(void) {
 	PCICR = 0x02;
 	}
 //-----------------------------------------------------------------------------
+void	DemoLoop(void) {
+	
+	}
+//-----------------------------------------------------------------------------
 void setup() {
 	Serial.begin(57600);
 	while (!Serial);
@@ -48,6 +54,8 @@ void setup() {
 	}
 //-----------------------------------------------------------------------------
 void loop() {
+	//Effect_TopDown(Axis_Z, 3, true, 5, 1000);
+	Effect_Rain(120, 100);
 	// Check the serial port
 	if(Serial.available()>0) {
 		switch (Serial.read()){
@@ -65,6 +73,24 @@ void loop() {
 				break;
 			case 'D':
 				digitalWrite(13, !digitalRead(13));
+				break;
+			case 'E':
+				for(i=0;i<8;i++){
+					LatchData(i, 0xFF);
+					}	
+				Serial.println("LatchData(0xFF)");
+				break;
+			case 'F':
+				for(i=0;i<8;i++){
+					LatchData(i, 0xAA);
+					}	
+				Serial.println("LatchData(0xAA)");
+				break;
+			case 'G':
+				for(i=0;i<8;i++){
+					LatchData(i, 0x00);
+					}	
+				Serial.println("LatchData(0x00)");
 				break;
 			case 'P':
 				delay(2);
@@ -95,6 +121,7 @@ void loop() {
 				break;
 			}
 		}
+		/*
 	// Check the xxx Btn
 	if(BtnFlag[0]) {
 		Serial.println("SW401");
@@ -112,5 +139,6 @@ void loop() {
 		Serial.write("\r\n");
 		TestPinPlag = false;
 		}
+		*/
 	}// Loop()
 //-----------------------------------------------------------------------------
