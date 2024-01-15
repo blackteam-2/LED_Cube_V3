@@ -25,6 +25,7 @@ void	SetMuxAddy(byte addy);
 #define	UPDATE_20HZ		781
 #define	UPDATE_30HZ		521
 #define	UPDATE_40HZ1	390
+#define	UPDATE_100HZ	156
 #define	UPDATE_40HZ		40
 
 // Holds the current layer that is active
@@ -47,7 +48,7 @@ void	InitCube(void) {
 		LatchLayer(i, false);
 
 	// Start the cube update by enabling the timer and ISR
-	Setup_Timer1(UPDATE_40HZ1);
+	Setup_Timer1(UPDATE_100HZ);
 
 	// Enable Global Interupts
 	sei();
@@ -106,22 +107,22 @@ ISR(TIMER1_COMPA_vect) {
 	//turn current layer on
 	LatchLayer(curLayer, true);
 
-	if(Debounce[0]>0) Debounce[0]--;
-	if(Debounce[1]>0) Debounce[1]--;
+	//if(Debounce[0]>0) Debounce[0]--;
+	//if(Debounce[1]>0) Debounce[1]--;
 	}
 //-----------------------------------------------------------------------------
 void	LatchData(byte multiplex, byte data) {
 	SetMuxAddy(multiplex);
 	digitalWrite(PIN_CS, HIGH);
 	SetData(data);
+	delayMicroseconds(20);
 	digitalWrite(PIN_CS, LOW);
-	delayMicroseconds(2);
 	}
 //-----------------------------------------------------------------------------
 volatile	void	LatchLayer(byte layer, bool level) {
 	digitalWrite(PIN_LAYLTCH, HIGH);
 	SetLayer(layer, level);
-	delayMicroseconds(2);
+	delayMicroseconds(20);
 	digitalWrite(PIN_LAYLTCH, LOW);
 	}
 //-----------------------------------------------------------------------------
