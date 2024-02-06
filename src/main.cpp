@@ -45,7 +45,7 @@ void setup() {
 	Serial.begin(57600);
 	while (!Serial);
 
-	SetupButtons();
+	//SetupButtons();
 	InitCube();
 
 	Serial.print("\r\nLED Cube V2 (");

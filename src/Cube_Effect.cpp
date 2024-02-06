@@ -18,14 +18,16 @@ void	EffectLoop(int Effect) {
 			Effect_Rain(120, 100);
 			break;
 		case EFF_TopDown:
-			//Effect_TopDown(Axis_Z, 3, true, 5, 500);
+			Effect_TopDown(Axis_Z, 3, true, 5, 500);
 			break;
 		case EFF_ShootText:
-			//EffectShootText(Plane_XY, "9876543210", 1, 600, 50);
+			EffectShootText(Plane_XY, "9876543210", 1, 600, 50);
 			break;
 		case EFF_Firework:
+			EffectFireworks(20, 20, 200);
 			break;
 		case EFF_ScrolText:
+			EffectScrollText(2, "This is a Test", 160);
 			break;
 		}
 	}
@@ -48,7 +50,8 @@ void	Effect_Rain(int iterations, unsigned long itterationDelay) {
 		}
 	}
 //-----------------------------------------------------------------------------
-void	Effect_TopDown(byte axis, int seperation, bool direction, int iterations, unsigned long itterationDelay) {
+void	Effect_TopDown(byte axis, int seperation, bool direction,
+	int iterations, unsigned long itterationDelay) {
 	int i, j;
 
 	SetAllPixelsOff();
@@ -80,7 +83,7 @@ void	Effect_TopDown(byte axis, int seperation, bool direction, int iterations, u
 					SetPlane(Plane_XY, 7, false);
 					break;
 				}
-			if(j == (seperation - 1)) {
+			if((j-seperation)==0) {
 				switch(axis) {
 					case Axis_X:
 						SetPlane(Plane_ZY, 7, true);
@@ -96,34 +99,26 @@ void	Effect_TopDown(byte axis, int seperation, bool direction, int iterations, u
 			delay(itterationDelay);
 			}
 		}
-	/*
-	if (seperation < 8)
-	{
-		for (i = 8 - seperation ; i < cubeSize ; i++)
-		{
-			//y-axis
-			if (axis == 0)
-			{
-				shift(axis,1);
-			}
-			
-			//x-axis
-			if (axis == 1)
-			{
-				shift(axis,1);
-			}
-			
-			//z-axis
-			if (axis == 2)
-			{
-				shift(axis,1);
+	if(seperation<8) {
+		switch(axis) {
+			case Axis_X:
+				ShiftPlane(Plane_ZY, 1, direction, false);
+				SetPlane(Plane_ZY, 7, false);
+				break;
+			case Axis_Y:
+				ShiftPlane(Plane_ZX, 1, direction, false);
+				SetPlane(Plane_ZX, 7, false);
+				break;
+			case Axis_Z:
+				ShiftPlane(Plane_XY, 1, !direction, false);
+				SetPlane(Plane_XY, 7, false);
+				break;
 			}
 		}
 	}
-	*/
-	}
 //-----------------------------------------------------------------------------
-void	EffectShootText(byte plane, String inputStr, int iterations, int delayTime, int shiftDelayTime) {
+void	EffectShootText(byte plane, String inputStr, int iterations,
+	int delayTime, int shiftDelayTime) {
 	int				i, j, len;
 	byte			k;
 	String			Str = inputStr;
@@ -238,10 +233,12 @@ void	EffectScrollText(int iterations, String inputstr, int delayTime) {
 		}
 	}
 //-----------------------------------------------------------------------------
-void Effect_ShootRandPixel(byte plane, int iterations, int delayTimeSmall, int delayTimeLarge) {
+void Effect_ShootRandPixel(byte plane, int iterations, int delayTimeSmall,
+	int delayTimeLarge) {
 	int 	i, j;
 	byte 	x, y, dir;
 
+	SetAllPixelsOff();
 	for(i=0; i<iterations; i++) {
 		dir = random(0,2);
 		x = random(0,8);
@@ -290,7 +287,62 @@ void Effect_ShootRandPixel(byte plane, int iterations, int delayTimeSmall, int d
 		}
 	}
 //-----------------------------------------------------------------------------
-void	Effect_UpDown_Suspend(int iterations, int SmallDelayTime, int LongDelayTime) {
+void	Effect_UpDown_Suspend(int iterations, int SmallDelayTime,
+	int LongDelayTime) {
+	byte	vPos[64];
+	int		itt, z, x, y;
+
+	SetAllPixelsOff();
+	// Set the vertical position for each colloum
+	for (z=0;z<PIXPERLAYER;z++)
+		vPos[z] = random(0,8);
+	// 
+	for (itt=0;itt<iterations;itt++) {
+		// Set the inital plane
+		SetPlane(Plane_XY, 0, true);
+		delay(SmallDelayTime * 2);
+		// move box top up from bottom to top
+		for (z=1;z<CUBESIZE;z++) {
+			for (x=0;x<CUBESIZE;x++) {
+				for (y=0;y<CUBESIZE;y++) {
+					if (z<=vPos[(x*8)+y])
+						SetPixel(x, y, z, true);
+					else 
+						SetPixel(x, y, z, false);
+					if((z-1)!=vPos[(x*8)+y])
+						SetPixel(x, y, z-1, false);
+					}
+				}
+			delay(SmallDelayTime);
+			}
+		// delay then move bottom of box from bottom to top
+		delay(LongDelayTime);
+		for (z=1;z<CUBESIZE;z++) {
+			for (x=0;x<CUBESIZE;x++) {
+				for (y=0;y<CUBESIZE;y++) {
+					if (z<vPos[(x*8)+y])
+						SetPixel(x, y, z, false);
+					else 
+						SetPixel(x, y, z, true);
+					SetPlane(Plane_XY, z-1, true);
+					}
+				}
+			delay(SmallDelayTime);
+			}
+
+
+
+
+
+		} //itt
+
+
+
+
+
+
+
+
 	/*int itt, i, j, k;
 
 
