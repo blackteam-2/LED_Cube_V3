@@ -51,6 +51,13 @@ int		CurrentLayer = 0;
 volatile unsigned char textPath[TEXTPATHLEN] = {0};
 
 //-----------------------------------------------------------------------------
+byte reverse(byte b) {
+   b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+   b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+   b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+   return b;
+}
+//-----------------------------------------------------------------------------
 // Set the value of a LED at the specefied position in the array
 void	SetPixel(byte X, byte Y, byte Z, bool Level) {
 	if(Level)
@@ -70,23 +77,42 @@ bool	GetPixel(byte X, byte Y, byte Z) {
 // Axis = Z, a=X, b=Y
 // eg. Set Z at a=0, b=0 will set all LEDs at {0}[0][Z] and produce a Vertical
 // line at X,Y = 0,0 (front right Corner)
-void	SetAxisLine(byte Axis, byte a, byte b, byte data) {
+void	SetAxisLine(byte Axis, byte a, byte b, byte data, bool dir) {
 	int 	i;
 
 	switch(Axis) {
 		case Axis_X:
+		if(dir) {
 			for(i=0; i<CUBESIZE; i++) {
 				SetPixel(i, a, b, data&0x01);
 				data >>= 1;
 				}
+			}
+		else {
+			for(i=CUBESIZE-1; i<0; i--) {
+				SetPixel(i, a, b, data&0x01);
+				data >>= 1;
+				}
+			}
 			break;
 		case Axis_Y:
-			CubeArray[a][b] = data;
+			if(dir)
+				CubeArray[a][b] = data;
+			else
+				CubeArray[a][b] = reverse(data);
 			break;
 		case Axis_Z:
-			for(i=0; i<CUBESIZE; i++) {
-				SetPixel(a, b, i, data&0x01);
-				data >>= 1;
+			if(dir) {
+				for(i=0; i<CUBESIZE; i++) {
+					SetPixel(a, b, i, data&0x01);
+					data >>= 1;
+					}
+				}
+			else{
+				for(i=CUBESIZE-1; i>0; i--) {
+					SetPixel(a, b, i, data&0x01);
+					data >>= 1;
+					}
 				}
 			break;
 		}
@@ -104,9 +130,9 @@ byte	GetAxisLine(byte Axis, byte a, byte b) {
 
 	switch(Axis) {
 		case Axis_X:
-			for(i=0; i<CUBESIZE; i++) {
-				rtn <<= 1;
+			for(i=(CUBESIZE-1); i>0; i--) {
 				rtn += GetPixel(i, a, b);
+				rtn <<= 1;
 				//SetArrayLED(i, a, b, Level);
 				}
 			break;
@@ -114,9 +140,9 @@ byte	GetAxisLine(byte Axis, byte a, byte b) {
 			rtn  = CubeArray[a][b];
 			break;
 		case Axis_Z:
-			for(i=0; i<CUBESIZE; i++) {
-				rtn <<= 1;
+			for(i=(CUBESIZE-1); i>0; i--) {
 				rtn += (int)GetPixel(a, b, i);
+				rtn <<= 1;
 				//SetArrayLED(a, b, i, Level);
 				}
 			break;
@@ -137,15 +163,15 @@ void	SetPlane(byte Plane, byte a, bool Level) {
 	switch(Plane) {
 		case Plane_ZX:
 			for(i=0; i<CUBESIZE; i++)
-				SetAxisLine(Axis_Z, a, i, (Level)?0xFF:0x00);
+				SetAxisLine(Axis_Z, i, a, (Level)?0xFF:0x00, true);
 			break;
 		case Plane_ZY:
 			for(i=0; i<CUBESIZE; i++)
-				SetAxisLine(Axis_Z, i, a, (Level)?0xFF:0x00);
+				SetAxisLine(Axis_Z, a, i, (Level)?0xFF:0x00, true);
 			break;
 		case Plane_XY:
 			for(i=0; i<CUBESIZE; i++)
-				SetAxisLine(Axis_Y, i, a, (Level)?0xFF:0x00);
+				SetAxisLine(Axis_Y, i, a, (Level)?0xFF:0x00, true);
 			break;
 		}
 	}
@@ -180,40 +206,42 @@ void	ShiftPlane(byte Plane, byte NoPos, bool Dir, bool ClrLay) {
 	if(NoPos>CUBESIZE) NoPos = CUBESIZE;
 
 	switch(Plane) {
+		//case Plane_ZY:
 		case Plane_ZX:
 			if(Dir) {
 				for(i=(CUBESIZE-1); i>=NoPos; i--)
 					for(j=0; j<CUBESIZE; j++)
-						SetAxisLine(Axis_Z, j, i, GetAxisLine(Axis_Z, j, i-NoPos));
+						SetAxisLine(Axis_Z, j, i, GetAxisLine(Axis_Z, j, i-NoPos), true);
 				}
 			else {
 				for(i=0; i<=CUBESIZE-NoPos; i++)
 					for(j=0; j<CUBESIZE; j++)
-						SetAxisLine(Axis_Z, j, i, GetAxisLine(Axis_Z, j, i+NoPos));
+						SetAxisLine(Axis_Z, j, i, GetAxisLine(Axis_Z, j, i+NoPos), true);
 				}
 			break;
 		case Plane_ZY:
+		//case Plane_ZX:
 			if(Dir) {
 				for(i=(CUBESIZE-1); i>=NoPos; i--)
 					for(j=0; j<CUBESIZE; j++)
-						SetAxisLine(Axis_Z, i, j, GetAxisLine(Axis_Z, i-NoPos, j));
+						SetAxisLine(Axis_Z, i, j, GetAxisLine(Axis_Z, i-NoPos, j), true);
 				}
 			else {
 				for(i=0; i<=CUBESIZE-NoPos; i++)
 					for(j=0; j<CUBESIZE; j++)
-						SetAxisLine(Axis_Z, i, j, GetAxisLine(Axis_Z, i+NoPos, j));
+						SetAxisLine(Axis_Z, i, j, GetAxisLine(Axis_Z, i+NoPos, j), true);
 				}
 			break;
 		case Plane_XY:
 			if(Dir) {
 				for(i=(CUBESIZE-1); i>=NoPos; i--)
 					for(j=0; j<CUBESIZE; j++)
-						SetAxisLine(Axis_Y, j, i, GetAxisLine(Axis_Y, j, i-NoPos));
+						SetAxisLine(Axis_Y, j, i, GetAxisLine(Axis_Y, j, i-NoPos), true);
 				}
 			else {
 				for(i=0; i<=CUBESIZE-NoPos; i++)
 					for(j=0; j<CUBESIZE; j++)
-						SetAxisLine(Axis_Y, j, i, GetAxisLine(Axis_Y, j, i+NoPos));
+						SetAxisLine(Axis_Y, j, i, GetAxisLine(Axis_Y, j, i+NoPos), true);
 				}
 			break;
 		}
@@ -249,13 +277,13 @@ void	AddTextToCubeLayer(byte plane, char Ch) {
 	for(i = 0; i<5; i++) {
 		switch(plane) {
 			case Plane_ZX:
-				SetAxisLine(Axis_Z, i+1, 0, ChData[i]);
+				SetAxisLine(Axis_Z, 6-i, 0, ChData[i], false);
 				break;
 			case Plane_ZY:
-				SetAxisLine(Axis_Z, 0, i+1, ChData[i]);
+				SetAxisLine(Axis_Z, 0, 6-i, ChData[i], false);
 				break;
 			case Plane_XY:
-				SetAxisLine(Axis_Y, i+1, 0, ChData[i]);
+				SetAxisLine(Axis_Y, i+1, 0, ChData[i], false);
 				break;
 			}
 		}
@@ -284,40 +312,40 @@ void	IncrementPath(void) {
 //-----------------------------------------------------------------------------
 // Start Path in back right corner, scrol in clockwise looking top down
 void	AddPathToCube(void) {
-	//			Axis  , X, Y, Data
+	//			Axis  , X, Y, Data		 , Dir
 	// Y axis, back to front
-	SetAxisLine(Axis_Z, 0, 7, textPath[0]);
-	SetAxisLine(Axis_Z, 0, 6, textPath[1]);
-	SetAxisLine(Axis_Z, 0, 5, textPath[2]);
-	SetAxisLine(Axis_Z, 0, 4, textPath[3]);
-	SetAxisLine(Axis_Z, 0, 3, textPath[4]);
-	SetAxisLine(Axis_Z, 0, 2, textPath[5]);
-	SetAxisLine(Axis_Z, 0, 1, textPath[6]);
-	SetAxisLine(Axis_Z, 0, 0, textPath[7]);
+	SetAxisLine(Axis_Z, 0, 7, textPath[0], false);
+	SetAxisLine(Axis_Z, 0, 6, textPath[1], false);
+	SetAxisLine(Axis_Z, 0, 5, textPath[2], false);
+	SetAxisLine(Axis_Z, 0, 4, textPath[3], false);
+	SetAxisLine(Axis_Z, 0, 3, textPath[4], false);
+	SetAxisLine(Axis_Z, 0, 2, textPath[5], false);
+	SetAxisLine(Axis_Z, 0, 1, textPath[6], false);
+	SetAxisLine(Axis_Z, 0, 0, textPath[7], false);
 	// X axis, front cube, right to left
-	SetAxisLine(Axis_Z, 1, 0, textPath[8]);
-	SetAxisLine(Axis_Z, 2, 0, textPath[9]);
-	SetAxisLine(Axis_Z, 3, 0, textPath[10]);
-	SetAxisLine(Axis_Z, 4, 0, textPath[11]);
-	SetAxisLine(Axis_Z, 5, 0, textPath[12]);
-	SetAxisLine(Axis_Z, 6, 0, textPath[13]);
-	SetAxisLine(Axis_Z, 7, 0, textPath[14]);
+	SetAxisLine(Axis_Z, 1, 0, textPath[8], false);
+	SetAxisLine(Axis_Z, 2, 0, textPath[9], false);
+	SetAxisLine(Axis_Z, 3, 0, textPath[10], false);
+	SetAxisLine(Axis_Z, 4, 0, textPath[11], false);
+	SetAxisLine(Axis_Z, 5, 0, textPath[12], false);
+	SetAxisLine(Axis_Z, 6, 0, textPath[13], false);
+	SetAxisLine(Axis_Z, 7, 0, textPath[14], false);
 	// Y axis, front to back
-	SetAxisLine(Axis_Z, 7, 1, textPath[15]);
-	SetAxisLine(Axis_Z, 7, 2, textPath[16]);
-	SetAxisLine(Axis_Z, 7, 3, textPath[17]);
-	SetAxisLine(Axis_Z, 7, 4, textPath[18]);
-	SetAxisLine(Axis_Z, 7, 5, textPath[19]);
-	SetAxisLine(Axis_Z, 7, 6, textPath[20]);
-	SetAxisLine(Axis_Z, 7, 7, textPath[21]);
+	SetAxisLine(Axis_Z, 7, 1, textPath[15], false);
+	SetAxisLine(Axis_Z, 7, 2, textPath[16], false);
+	SetAxisLine(Axis_Z, 7, 3, textPath[17], false);
+	SetAxisLine(Axis_Z, 7, 4, textPath[18], false);
+	SetAxisLine(Axis_Z, 7, 5, textPath[19], false);
+	SetAxisLine(Axis_Z, 7, 6, textPath[20], false);
+	SetAxisLine(Axis_Z, 7, 7, textPath[21], false);
 	// x axis, cube back, left to right
-	SetAxisLine(Axis_Z, 6, 7, textPath[22]);
-	SetAxisLine(Axis_Z, 6, 6, textPath[23]);
-	SetAxisLine(Axis_Z, 6, 5, textPath[24]);
-	SetAxisLine(Axis_Z, 6, 4, textPath[25]);
-	SetAxisLine(Axis_Z, 6, 3, textPath[26]);
-	SetAxisLine(Axis_Z, 6, 2, textPath[27]);
-	SetAxisLine(Axis_Z, 6, 1, textPath[28]);
+	SetAxisLine(Axis_Z, 6, 7, textPath[22], false);
+	SetAxisLine(Axis_Z, 5, 7, textPath[23], false);
+	SetAxisLine(Axis_Z, 4, 7, textPath[24], false);
+	SetAxisLine(Axis_Z, 3, 7, textPath[25], false);
+	SetAxisLine(Axis_Z, 2, 7, textPath[26], false);
+	SetAxisLine(Axis_Z, 1, 7, textPath[27], false);
+	//SetAxisLine(Axis_Z, 0, 7, textPath[28], false);
 	}
 //-----------------------------------------------------------------------------
 void	CheckArgOrder(int in1, int in2, int *out1, int *out2){

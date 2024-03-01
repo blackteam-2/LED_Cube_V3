@@ -45,7 +45,7 @@ extern	int		CurrentLayer;
 //-----------------------------------------------------------------------------
 void	SetPixel(byte X, byte Y, byte Z, bool Level);
 bool	GetPixel(byte X, byte Y, byte Z);
-void	SetAxisLine(byte Axis, byte a, byte b, byte data);
+void	SetAxisLine(byte Axis, byte a, byte b, byte data, bool dir);
 byte	GetAxisLine(byte Axis, byte a, byte b);
 void	SetPlane(byte Plane, byte a, bool Level);
 void	SetAllPixelsOff();

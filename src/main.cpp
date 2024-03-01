@@ -37,10 +37,6 @@ void	SetupButtons(void) {
 	PCICR = 0x02;
 	}
 //-----------------------------------------------------------------------------
-void	DemoLoop(void) {
-	
-	}
-//-----------------------------------------------------------------------------
 void setup() {
 	Serial.begin(57600);
 	while (!Serial);
@@ -54,8 +50,13 @@ void setup() {
 	}
 //-----------------------------------------------------------------------------
 void loop() {
-	//Effect_TopDown(Axis_Z, 3, true, 5, 1000);
-	Effect_Rain(120, 100);
+	Effect_Rain(120, 150);
+	EffectShootText(Plane_ZX, "9876543210", 1, 600, 50);
+	EffectFireworks(5, 20, 200);
+	EffectScrollText(2, "Welcome To Harvest", 160);
+	Effect_TopDown(Axis_Z, 2, true, 5, 800);
+	
+	/*
 	// Check the serial port
 	if(Serial.available()>0) {
 		switch (Serial.read()){
@@ -120,7 +121,7 @@ void loop() {
 					}
 				break;
 			}
-		}
+		}*/
 		/*
 	// Check the xxx Btn
 	if(BtnFlag[0]) {

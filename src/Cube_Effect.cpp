@@ -134,7 +134,8 @@ void	EffectShootText(byte plane, String inputStr, int iterations,
 			delay(shiftDelayTime);
 			for(k=0; k<(CUBESIZE-1); k++) {
 				ShiftPlane(plane, 1, true, false);
-				SetPlane(plane, k-1, false);
+				if(k<(CUBESIZE-1))
+					SetPlane(plane, k, false);
 				delay(shiftDelayTime);
 				}
 			delay(delayTime);
@@ -162,7 +163,7 @@ void	EffectFireworks(int iterations, int n, int delayTime) {
 		origin_y += 2;
 		// shoot a particle up in the air
 		for (k=0; k<origin_z; k++) {
-			SetPixel(k, origin_x, origin_y, true);
+			SetPixel(origin_x, origin_y, k, true);
 			delay(160 * k);
 			SetAllPixelsOff();
 			}
@@ -189,7 +190,7 @@ void	EffectFireworks(int iterations, int n, int delayTime) {
 				particles[j][1] += particles[j][4] / slowrate;
 				particles[j][2] += particles[j][5] / slowrate;
 				particles[j][2] -= gravity;
-				SetPixel(particles[j][2],particles[j][0],particles[j][1],true);
+				SetPixel(particles[j][0],particles[j][1],particles[j][2],true);
 				}
 			delay(delayTime);
 			SetAllPixelsOff();
