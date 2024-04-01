@@ -32,6 +32,8 @@ void	SetMuxAddy(byte addy);
 // Holds the current layer that is active
 volatile byte curLayer = 1;
 
+byte 	temp;
+int 	a;
 
 //-----------------------------------------------------------------------------
 void	InitCube(void) {
@@ -65,6 +67,7 @@ void	SetupCubeIO(void) {
 	pinMode(PIN_ADDY1, OUTPUT);
 	pinMode(PIN_ADDY2, OUTPUT);
 	pinMode(PIN_CS, OUTPUT);
+	pinMode(PIN_LAYLTCH, OUTPUT);
 	}
 //-----------------------------------------------------------------------------
 void	Setup_Timer1(uint16_t reloadVal){
@@ -73,7 +76,7 @@ void	Setup_Timer1(uint16_t reloadVal){
 	TCCR1B = 0x00;
 	TCCR1C = 0x00;
 	if (reloadVal == 0) { return; }
-	Serial.println("Start");
+	//Serial.println("Start");
 	// CRC Mode, OVF_Int, Clk/1024
 	TCCR1B |= (1 << WGM12);
 	OCR1A = reloadVal;
@@ -84,9 +87,6 @@ void	Setup_Timer1(uint16_t reloadVal){
 // Cube Update ISR
 // This controls the persistence of vision 
 ISR(TIMER1_COMPA_vect) {
-	byte 	temp;
-	int 	a;
-
 	//turn current layer off
 	LatchLayer(curLayer, false);
 	// Move to the next layer
@@ -101,17 +101,26 @@ ISR(TIMER1_COMPA_vect) {
 	}
 //-----------------------------------------------------------------------------
 void	LatchData(byte multiplex, byte data) {
+	int i;
+
 	SetMuxAddy(multiplex);
+	for(i=0; i<2; i++) {}
 	fDigitalWrite(PIN_CS, HIGH);
+	for(i=0; i<2; i++) {}
 	SetData(data);
 	//delayMicroseconds(20);
+	for(i=0; i<2; i++) {}
 	fDigitalWrite(PIN_CS, LOW);
 	}
 //-----------------------------------------------------------------------------
 volatile	void	LatchLayer(byte layer, bool level) {
+	int i;
+
 	fDigitalWrite(PIN_LAYLTCH, HIGH);
+	for(i=0; i<2; i++) {}
 	SetLayer(layer, level);
 	//delayMicroseconds(20);
+	for(i=0; i<2; i++) {}
 	fDigitalWrite(PIN_LAYLTCH, LOW);
 	}
 //-----------------------------------------------------------------------------
@@ -194,8 +203,4 @@ void	SetMuxAddy(byte addy) {
 	fDigitalWrite(PIN_ADDY1, HIGH && (addy & 0x02));
 	fDigitalWrite(PIN_ADDY2, HIGH && (addy & 0x04));
 	}
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-
 //-----------------------------------------------------------------------------

@@ -58,5 +58,7 @@ void	AddChToPath(byte inputChr, int pos);
 void	IncrementPath(void);
 void	AddPathToCube(void);
 void 	CheckArgOrder(int in1, int in2, int *out1, int *out2);
+void 	DrawWireframe(int XPos1, int YPos1, int ZPos1, int XPos2,
+			int YPos2, int ZPos2);
 
 #endif //__CUBE__

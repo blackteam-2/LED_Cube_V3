@@ -4,7 +4,7 @@
 #include	"Cube_Effect.h"
 #include	"Cube.h"
 
-char	*VerString = "0.00.01";
+//char	*VerString = "0.00.01";
 
 int 	i, port, data;
 
@@ -38,23 +38,19 @@ void	SetupButtons(void) {
 	}
 //-----------------------------------------------------------------------------
 void setup() {
-	Serial.begin(57600);
-	while (!Serial);
-
 	//SetupButtons();
 	InitCube();
-
-	Serial.print("\r\nLED Cube V2 (");
-	Serial.print(VerString);
-	Serial.print(")\r\n");
 	}
 //-----------------------------------------------------------------------------
 void loop() {
-	Effect_Rain(120, 150);
+	Effect_BoxShrinkGrow(2, 2, 200);
+	Effect_Rain(120, 160);
 	EffectShootText(Plane_ZX, "9876543210", 1, 600, 50);
 	EffectFireworks(5, 20, 200);
+	Effect_UpDown_Suspend(5, 120, 1000);
 	EffectScrollText(2, "Welcome To Harvest", 160);
-	Effect_TopDown(Axis_Z, 2, true, 5, 800);
+	Effect_ShootRandPixel(Plane_XY,40,50,1, false);
+	Effect_TopDown(Axis_Z, 3, true, 3, 600);
 	
 	/*
 	// Check the serial port

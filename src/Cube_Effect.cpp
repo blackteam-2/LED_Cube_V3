@@ -52,7 +52,8 @@ void	Effect_Rain(int iterations, unsigned long itterationDelay) {
 //-----------------------------------------------------------------------------
 void	Effect_TopDown(byte axis, int seperation, bool direction,
 	int iterations, unsigned long itterationDelay) {
-	int i, j;
+	int i, j, k = 0;
+	bool clear = false;
 
 	SetAllPixelsOff();
 	switch(axis) {
@@ -68,6 +69,7 @@ void	Effect_TopDown(byte axis, int seperation, bool direction,
 		}
 	delay(itterationDelay);
 	for(i=0; i<iterations; i++) {
+		//k = 0;
 		for(j=0; j<CUBESIZE; j++) {
 			switch(axis) {
 				case Axis_X:
@@ -83,7 +85,8 @@ void	Effect_TopDown(byte axis, int seperation, bool direction,
 					SetPlane(Plane_XY, 7, false);
 					break;
 				}
-			if((j-seperation)==0) {
+			//if((seperation-1)==j) {
+			if(k == seperation) {
 				switch(axis) {
 					case Axis_X:
 						SetPlane(Plane_ZY, 7, true);
@@ -95,24 +98,33 @@ void	Effect_TopDown(byte axis, int seperation, bool direction,
 						SetPlane(Plane_XY, 7, true);
 						break;
 					}
+				clear = true;
+				}
+			k++;
+			if(clear) {
+				k = 0;
+				clear = false;
 				}
 			delay(itterationDelay);
 			}
 		}
 	if(seperation<8) {
-		switch(axis) {
-			case Axis_X:
-				ShiftPlane(Plane_ZY, 1, direction, false);
-				SetPlane(Plane_ZY, 7, false);
-				break;
-			case Axis_Y:
-				ShiftPlane(Plane_ZX, 1, direction, false);
-				SetPlane(Plane_ZX, 7, false);
-				break;
-			case Axis_Z:
-				ShiftPlane(Plane_XY, 1, !direction, false);
-				SetPlane(Plane_XY, 7, false);
-				break;
+		for(i=CUBESIZE - seperation; i>=0; i--) {
+			switch(axis) {
+				case Axis_X:
+					ShiftPlane(Plane_ZY, 1, direction, false);
+					SetPlane(Plane_ZY, 7, false);
+					break;
+				case Axis_Y:
+					ShiftPlane(Plane_ZX, 1, direction, false);
+					SetPlane(Plane_ZX, 7, false);
+					break;
+				case Axis_Z:
+					ShiftPlane(Plane_XY, 1, !direction, false);
+					SetPlane(Plane_XY, 7, false);
+					break;
+				}
+			delay(itterationDelay);
 			}
 		}
 	}
@@ -201,7 +213,7 @@ void	EffectFireworks(int iterations, int n, int delayTime) {
 void	EffectScrollText(int iterations, String inputstr, int delayTime) {
 	int i, j, k;
 	String inpStr = inputstr;
-	int len = inputstr.length();
+	int len = inpStr.length();
 
 	SetAllPixelsOff();
 	ResetTextPath();
@@ -234,56 +246,59 @@ void	EffectScrollText(int iterations, String inputstr, int delayTime) {
 		}
 	}
 //-----------------------------------------------------------------------------
-void Effect_ShootRandPixel(byte plane, int iterations, int delayTimeSmall,
-	int delayTimeLarge) {
+void Effect_ShootRandPixel(byte plane, int iterations, 
+	unsigned long delayTimeSmall, unsigned long delayTimeLarge,
+	bool StartPlaneOn) {
 	int 	i, j;
 	byte 	x, y, dir;
 
 	SetAllPixelsOff();
+	if(StartPlaneOn){
+		SetPlane(plane, 0, true);
+		SetPlane(plane, 7, true);
+		}
 	for(i=0; i<iterations; i++) {
 		dir = random(0,2);
 		x = random(0,8);
 		y = random(0,8);
-		if(dir)
+		if(dir) {
 			for(j=1; j<CUBESIZE; j++) {
 				switch(plane) {
 					case Plane_ZX:
-						SetPixel(x, i, y, true);
-						SetPixel(x, i-1, y, false);
-						delay(delayTimeSmall);
+						SetPixel(x, j, y, true);
+						SetPixel(x, j-1, y, false);
 						break;
 					case Plane_ZY:
-						SetPixel(i, y, x, true);
-						SetPixel(i-1, y, x, false);
-						delay(delayTimeSmall);
+						SetPixel(j, y, x, true);
+						SetPixel(j-1, y, x, false);
 						break;
 					case Plane_XY:
-						SetPixel(x, y, i, true);
-						SetPixel(x, y, i-1, false);
-						delay(delayTimeSmall);
+						SetPixel(x, y, j, true);
+						SetPixel(x, y, j-1, false);
 						break;
 					}
+				delay(delayTimeSmall);
 				}
-		else
-			for(j=6; j>=0; j--) {
+			}
+		else {
+			for(j=7; j>=0; j--) {
 				switch(plane) {
 					case Plane_ZX:
-						SetPixel(x, i, y, true);
-						SetPixel(x, i+1, y, false);
-						delay(delayTimeSmall);
+						SetPixel(x, j, y, true);
+						SetPixel(x, j+1, y, false);
 						break;
 					case Plane_ZY:
-						SetPixel(i, y, x, true);
-						SetPixel(i+1, y, x, false);
-						delay(delayTimeSmall);
+						SetPixel(j, y, x, true);
+						SetPixel(j+1, y, x, false);
 						break;
 					case Plane_XY:
-						SetPixel(x, y, i, true);
-						SetPixel(x, y, i+1, false);
-						delay(delayTimeSmall);
+						SetPixel(x, y, j, true);
+						SetPixel(x, y, j+1, false);
 						break;
 					}
+				delay(delayTimeSmall);
 				}
+			}
 		delay(delayTimeLarge);
 		}
 	}
@@ -294,11 +309,10 @@ void	Effect_UpDown_Suspend(int iterations, int SmallDelayTime,
 	int		itt, z, x, y;
 
 	SetAllPixelsOff();
-	// Set the vertical position for each colloum
-	for (z=0;z<PIXPERLAYER;z++)
-		vPos[z] = random(0,8);
-	// 
 	for (itt=0;itt<iterations;itt++) {
+		// Set the vertical position for each colloum
+		for (z=0;z<PIXPERLAYER;z++)
+			vPos[z] = random(0,8);
 		// Set the inital plane
 		SetPlane(Plane_XY, 0, true);
 		delay(SmallDelayTime * 2);
@@ -325,40 +339,104 @@ void	Effect_UpDown_Suspend(int iterations, int SmallDelayTime,
 						SetPixel(x, y, z, false);
 					else 
 						SetPixel(x, y, z, true);
-					SetPlane(Plane_XY, z-1, true);
+					SetPlane(Plane_XY, z-1, false);
 					}
 				}
 			delay(SmallDelayTime);
 			}
-
-
-
-
-
+		// delay then move bottom of box back to the bottom
+		delay(LongDelayTime);
+		for (z=6;z>=0;z--) {
+			for (x=0;x<CUBESIZE;x++) {
+				for (y=0;y<CUBESIZE;y++) {
+					if (z>=vPos[(x*8)+y])
+						SetPixel(x, y, z, true);
+					else 
+						SetPixel(x, y, z, false);
+					if((z+1)!=vPos[(x*8)+y])
+						SetPixel(x, y, z+1, false);
+					}
+				}
+			delay(SmallDelayTime);
+			}
+		delay(LongDelayTime);
+		// delay then move top of box back to bottom
+		for (z=6;z>=0;z--) {
+			for (x=0;x<CUBESIZE;x++) {
+				for (y=0;y<CUBESIZE;y++) {
+					if (z>vPos[(x*8)+y])
+						SetPixel(x, y, z, false);
+					else 
+						SetPixel(x, y, z, true);
+					SetPlane(Plane_XY, z+1, false);
+					}
+				}
+			delay(SmallDelayTime);
+			}
+		delay(LongDelayTime);
 		} //itt
-
-
-
-
-
-
-
-
-	/*int itt, i, j, k;
-
-
-	SetAllPixelsOff();
-	for(itt=0; itt<iterations; itt++) {
-		// move plane up
-
-		// move plane bottom up
-
-		// move plane down
-
-		//move plain top down
-
-		}*/
 	}
 //-----------------------------------------------------------------------------
+void Effect_BoxShrinkGrow(int iterations, int type, int DelayTime) {
+	int iter = 0, i, j;
 
+	SetAllPixelsOff();
+	for (iter = 0 ; iter < iterations; iter++) {
+		//Centre
+		for (j = 3 ; j >= 0 ; j--) {
+			SetAllPixelsOff();
+			DrawWireframe(3-j, 3-j, 3-j, 4+j, 4+j, 4+j);
+			delay(DelayTime);
+			}
+		for (j = 0 ; j < 4 ; j++) {
+			SetAllPixelsOff();
+			DrawWireframe(3-j, 3-j, 3-j, 4+j, 4+j, 4+j);
+			delay(DelayTime);
+			}
+		//0,0,0
+		for (j = 7 ; j >= 1 ; j--) {
+			SetAllPixelsOff();
+			DrawWireframe(0, 0, 0, j, j, j);
+			delay(DelayTime);
+			}
+		for (j = 1 ; j < 7 ; j++) {
+			SetAllPixelsOff();
+			DrawWireframe(0, 0, 0, j, j, j);
+			delay(DelayTime);
+			}
+		//0,7,7
+		for (j = 7 ; j >= 1 ; j--) {
+			SetAllPixelsOff();
+			DrawWireframe(7, 0, 7, 7-j, j, 7-j);
+			delay(DelayTime);
+			}
+		for (j = 1 ; j < 7 ; j++) {
+			SetAllPixelsOff();
+			DrawWireframe(7, 0, 7, 7-j, j, 7-j);
+			delay(DelayTime);
+			}
+		//7,0,7
+		for (j = 7 ; j >= 1 ; j--) {
+			SetAllPixelsOff();
+			DrawWireframe(0, 7, 7, j, 7-j, 7-j);
+			delay(DelayTime);
+			}
+		for (j = 1 ; j < 7 ; j++) {
+			SetAllPixelsOff();
+			DrawWireframe(0, 7, 7, j, 7-j, 7-j);
+			delay(DelayTime);
+			}
+		//7,7,0
+		for (j = 7 ; j >= 1 ; j--)  {
+			SetAllPixelsOff();
+			DrawWireframe(7, 7, 0, 7-j, 7-j, j);
+			delay(DelayTime);
+			}
+		for (j = 1 ; j <= 7 ; j++) {
+			SetAllPixelsOff();
+			DrawWireframe(7, 7, 0, 7-j, 7-j, j);
+			delay(DelayTime);
+			}
+		}
+	}
 //-----------------------------------------------------------------------------

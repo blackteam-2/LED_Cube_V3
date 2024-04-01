@@ -17,7 +17,7 @@ data/functions for handling text as well as the scrollint text
 // Y - Front	->	Back
 // Z - Bottom	->	Top
 /*
----Top View---																								 		___________
+---Top View---																								 		_____________
 {7}[7][Z]	{7}[6][Z]	{7}[5][Z]	{7}[4][Z]	{7}[3][Z]	{7}[2][Z]	{7}[1][Z]	{7}[0][Z]			|			|			|
 {6}[7][Z]	{6}[6][Z]	{6}[5][Z]	{6}[4][Z]	{6}[3][Z]	{6}[2][Z]	{6}[1][Z]	{6}[0][Z]			|			|			|
 {5}[7][Z]	{5}[6][Z]	{5}[5][Z]	{5}[4][Z]	{5}[3][Z]	{5}[2][Z]	{5}[1][Z]	{5}[0][Z]			|			|			|
@@ -48,7 +48,7 @@ ________________________________________________________________________________
 byte	CubeArray[8][8];
 int		CurrentLayer = 0;
 // Data Array to hold the text info for itterating around the path
-volatile unsigned char textPath[TEXTPATHLEN] = {0};
+volatile byte textPath[TEXTPATHLEN] = {0};
 
 //-----------------------------------------------------------------------------
 byte reverse(byte b) {
@@ -60,6 +60,9 @@ byte reverse(byte b) {
 //-----------------------------------------------------------------------------
 // Set the value of a LED at the specefied position in the array
 void	SetPixel(byte X, byte Y, byte Z, bool Level) {
+	if((X<0)||(X>=CUBESIZE)) return;
+	if((Y<0)||(Y>=CUBESIZE)) return;
+	if((Z<0)||(Z>=CUBESIZE)) return;
 	if(Level)
 		CubeArray[X][Z] |= wBit[Y];
 	else
@@ -357,5 +360,32 @@ void	CheckArgOrder(int in1, int in2, int *out1, int *out2){
 	
 	*out1 = in1;
 	*out2 = in2;
+	}
+//-----------------------------------------------------------------------------
+void DrawWireframe(int XPos1, int YPos1, int ZPos1, int XPos2,
+	int YPos2, int ZPos2) {
+	int i;
+
+	CheckArgOrder(XPos1, XPos2, &XPos1, &XPos2);
+	CheckArgOrder(YPos1, YPos2, &YPos1, &YPos2);
+	CheckArgOrder(ZPos1, ZPos2, &ZPos1, &ZPos2);
+	for (i = XPos1 ; i <= XPos2 ; i++){
+		SetPixel(i, YPos1, ZPos1, true);
+		SetPixel(i, YPos1, ZPos2, true);
+		SetPixel(i, YPos2, ZPos1, true);
+		SetPixel(i, YPos2, ZPos2, true);
+		}
+	for (i = YPos1 ; i <= YPos2 ; i++){
+		SetPixel(XPos1, i, ZPos1, true);
+		SetPixel(XPos1, i, ZPos2, true);
+		SetPixel(XPos2, i, ZPos1, true);
+		SetPixel(XPos2, i, ZPos2, true);
+		}
+	for (i = ZPos1 ; i <= ZPos2 ; i++){
+		SetPixel(XPos1, YPos1, i, true);
+		SetPixel(XPos2, YPos1, i, true);
+		SetPixel(XPos1, YPos2, i, true);
+		SetPixel(XPos2, YPos2, i, true);
+		}
 	}
 //-----------------------------------------------------------------------------
