@@ -307,7 +307,7 @@ void	AddChToPath(byte inputChr, int pos) {
 void	IncrementPath(void) {
 	int i;
 
-	for(i=TEXTPATHLEN; i>=0; i--) {
+	for(i=TEXTPATHLEN-2; i>=0; i--) {
 		textPath[i+1] = textPath[i];
 		}
 	textPath[0] = 0;
@@ -317,38 +317,37 @@ void	IncrementPath(void) {
 void	AddPathToCube(void) {
 	//			Axis  , X, Y, Data		 , Dir
 	// Y axis, back to front
-	SetAxisLine(Axis_Z, 0, 7, textPath[0], false);
-	SetAxisLine(Axis_Z, 0, 6, textPath[1], false);
-	SetAxisLine(Axis_Z, 0, 5, textPath[2], false);
-	SetAxisLine(Axis_Z, 0, 4, textPath[3], false);
-	SetAxisLine(Axis_Z, 0, 3, textPath[4], false);
-	SetAxisLine(Axis_Z, 0, 2, textPath[5], false);
-	SetAxisLine(Axis_Z, 0, 1, textPath[6], false);
-	SetAxisLine(Axis_Z, 0, 0, textPath[7], false);
+	SetAxisLine(Axis_Z, 0, 7, textPath[5], false);
+	SetAxisLine(Axis_Z, 0, 6, textPath[6], false);
+	SetAxisLine(Axis_Z, 0, 5, textPath[7], false);
+	SetAxisLine(Axis_Z, 0, 4, textPath[8], false);
+	SetAxisLine(Axis_Z, 0, 3, textPath[9], false);
+	SetAxisLine(Axis_Z, 0, 2, textPath[10], false);
+	SetAxisLine(Axis_Z, 0, 1, textPath[11], false);
+	SetAxisLine(Axis_Z, 0, 0, textPath[12], false);
 	// X axis, front cube, right to left
-	SetAxisLine(Axis_Z, 1, 0, textPath[8], false);
-	SetAxisLine(Axis_Z, 2, 0, textPath[9], false);
-	SetAxisLine(Axis_Z, 3, 0, textPath[10], false);
-	SetAxisLine(Axis_Z, 4, 0, textPath[11], false);
-	SetAxisLine(Axis_Z, 5, 0, textPath[12], false);
-	SetAxisLine(Axis_Z, 6, 0, textPath[13], false);
-	SetAxisLine(Axis_Z, 7, 0, textPath[14], false);
+	SetAxisLine(Axis_Z, 1, 0, textPath[13], false);
+	SetAxisLine(Axis_Z, 2, 0, textPath[14], false);
+	SetAxisLine(Axis_Z, 3, 0, textPath[15], false);
+	SetAxisLine(Axis_Z, 4, 0, textPath[16], false);
+	SetAxisLine(Axis_Z, 5, 0, textPath[17], false);
+	SetAxisLine(Axis_Z, 6, 0, textPath[18], false);
+	SetAxisLine(Axis_Z, 7, 0, textPath[19], false);
 	// Y axis, front to back
-	SetAxisLine(Axis_Z, 7, 1, textPath[15], false);
-	SetAxisLine(Axis_Z, 7, 2, textPath[16], false);
-	SetAxisLine(Axis_Z, 7, 3, textPath[17], false);
-	SetAxisLine(Axis_Z, 7, 4, textPath[18], false);
-	SetAxisLine(Axis_Z, 7, 5, textPath[19], false);
-	SetAxisLine(Axis_Z, 7, 6, textPath[20], false);
-	SetAxisLine(Axis_Z, 7, 7, textPath[21], false);
+	SetAxisLine(Axis_Z, 7, 1, textPath[20], false);
+	SetAxisLine(Axis_Z, 7, 2, textPath[21], false);
+	SetAxisLine(Axis_Z, 7, 3, textPath[22], false);
+	SetAxisLine(Axis_Z, 7, 4, textPath[23], false);
+	SetAxisLine(Axis_Z, 7, 5, textPath[24], false);
+	SetAxisLine(Axis_Z, 7, 6, textPath[25], false);
+	SetAxisLine(Axis_Z, 7, 7, textPath[26], false);
 	// x axis, cube back, left to right
-	SetAxisLine(Axis_Z, 6, 7, textPath[22], false);
-	SetAxisLine(Axis_Z, 5, 7, textPath[23], false);
-	SetAxisLine(Axis_Z, 4, 7, textPath[24], false);
-	SetAxisLine(Axis_Z, 3, 7, textPath[25], false);
-	SetAxisLine(Axis_Z, 2, 7, textPath[26], false);
-	SetAxisLine(Axis_Z, 1, 7, textPath[27], false);
-	//SetAxisLine(Axis_Z, 0, 7, textPath[28], false);
+	SetAxisLine(Axis_Z, 6, 7, textPath[27], false);
+	SetAxisLine(Axis_Z, 5, 7, textPath[28], false);
+	SetAxisLine(Axis_Z, 4, 7, textPath[29], false);
+	SetAxisLine(Axis_Z, 3, 7, textPath[30], false);
+	SetAxisLine(Axis_Z, 2, 7, textPath[31], false);
+	SetAxisLine(Axis_Z, 1, 7, textPath[32], false);
 	}
 //-----------------------------------------------------------------------------
 void	CheckArgOrder(int in1, int in2, int *out1, int *out2){

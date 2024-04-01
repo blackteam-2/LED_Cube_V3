@@ -7,7 +7,7 @@ void	EffectLoop(int Effect) {
 	int SelEffect = 0;
 
 	if(Effect==EFF_ALL) {
-		if(++EffAllPos > 2) EffAllPos = 0;
+		if(++EffAllPos == EFF_End) EffAllPos = 1;
 		SelEffect = EffAllPos;
 		}
 	else
@@ -219,14 +219,11 @@ void	EffectScrollText(int iterations, String inputstr, int delayTime) {
 	ResetTextPath();
 	for (i=0; i<iterations ; i++) {
 		for (j=0 ; j<len ; j++) {
-			//
 			char Ch = inpStr[j];
 			unsigned char ChArr[5] = {0};
 			GetCharPattern(Ch, ChArr);
-			
 			// Add the new chrachter 
 			for (k=0 ; k<5 ; k++) {
-				//
 				AddChToPath(ChArr[k], 0);
 				AddPathToCube();
 				delay(delayTime);

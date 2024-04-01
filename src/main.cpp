@@ -30,11 +30,11 @@ ISR(PCINT1_vect){
 void	SetupButtons(void) {
 	pinMode(PIN_BUTT_LEFT, INPUT_PULLUP);
 	pinMode(PIN_BUTT_RIGHT, INPUT_PULLUP);
-
+	/*
 	// Set the mask for the PCINT pins (PCINT10 + PCINT11)
-	PCMSK1 = 0x0C;
+	PCMSK1 = PCINT10|PCINT10;
 	// Set The Pin Change int bank (PCINT1)
-	PCICR = 0x02;
+	PCICR |=  0x02; */
 	}
 //-----------------------------------------------------------------------------
 void setup() {
@@ -49,7 +49,7 @@ void loop() {
 	EffectFireworks(5, 20, 200);
 	Effect_UpDown_Suspend(5, 120, 1000);
 	EffectScrollText(2, "Welcome To Harvest", 160);
-	Effect_ShootRandPixel(Plane_XY,40,50,1, false);
+	Effect_ShootRandPixel(Plane_XY,50,50,1, false);
 	Effect_TopDown(Axis_Z, 3, true, 3, 600);
 	
 	/*

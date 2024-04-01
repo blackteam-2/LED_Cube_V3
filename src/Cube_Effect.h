@@ -6,6 +6,8 @@
 typedef enum {
 	EFF_ALL = 0, 		EFF_Rain = 1, 		EFF_TopDown = 2, 
 	EFF_ShootText = 3,	EFF_Firework = 4,	EFF_ScrolText = 5,
+	EFF_RandPixel = 6,	EFF_UpDnSup = 7,	EFF_BoxShGr = 8,
+	EFF_End = 9,
 	}EffectEnum;
 //-----------------------------------------------------------------------------
 void	EffectLoop(int Effect);
